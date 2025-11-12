@@ -6,9 +6,9 @@
 *.ps1 text eol=crlf
 # Shell スクリプトは LF を使用
 *.sh text eol=lf
-# JSON/YAML は LF を使用
+# JSON/text は LF を使用
 *.json text eol=lf
-*.yaml text eol=lf
+*.text text eol=lf
 *.yml text eol=lf
 # バイナリファイルは変換しない
 *.png binary
