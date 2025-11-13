@@ -1,211 +1,116 @@
-# 実装計画: Todo App - template-no-delete.tsx ベースアプリケーション# Implementation Plan: [FEATURE]
+# 実装計画: Todo App - template-no-delete.tsx ベースアプリケーション
 
+**ブランチ**: `feature/impl-001-todo-app` | **日付**: 2025-11-13 | **仕様**: [specs/001-todo-app-spec/spec.md](../001-todo-app-spec/spec.md)
 
+**入力**: 機能仕様書 `/specs/001-todo-app-spec/spec.md`
 
-**ブランチ**: `feature/impl-001-todo-app` | **日付**: 2025-11-13 | **仕様**: [specs/001-todo-app-spec/spec.md](../001-todo-app-spec/spec.md)  **Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**注記**: この実装計画は `/speckit.plan` コマンドによって生成されました。
 
-**入力**: 機能仕様書 `/specs/001-todo-app-spec/spec.md`**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
+## 概要
 
+**主要要件**: 開発者が自分専用のTodoページを作成し、タスクの追加・完了切り替え・フィルタリング・削除ができるReact+TypeScriptアプリケーション。LocalStorageによるデータ永続化、ワンコマンド起動（start.ps1）、GitHub Pagesデプロイをサポート。
 
-
-**注記**: この実装計画は `/speckit.plan` コマンドによって生成されました。**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
-
-
-
-## 概要## Summary
-
-
-
-**主要要件**: 開発者が自分専用のTodoページを作成し、タスクの追加・完了切り替え・フィルタリング・削除ができるReact+TypeScriptアプリケーション。LocalStorageによるデータ永続化、ワンコマンド起動（start.ps1）、GitHub Pagesデプロイをサポート。[Extract from feature spec: primary requirement + technical approach from research]
-
-
-
-**技術アプローチ**: ## Technical Context
-
+**技術アプローチ**: 
 - React 18.2.0のHooksベース（useState、useEffect）で状態管理
-
-- TypeScript 4.9.3による型安全性確保<!--
-
-- Vite 4.2.0による高速ビルドとHMR  ACTION REQUIRED: Replace the content in this section with the technical details
-
-- Vitest 0.34.0によるテスト駆動開発（100%カバレッジ目標）  for the project. The structure here is presented in advisory capacity to guide
-
-- LocalStorageによるクライアントサイド永続化  the iteration process.
-
-- UIkit 3.16.10によるUIコンポーネント-->
-
+- TypeScript 4.9.3による型安全性確保
+- Vite 4.2.0による高速ビルドとHMR
+- Vitest 0.34.0によるテスト駆動開発（100%カバレッジ目標）
+- LocalStorageによるクライアントサイド永続化
+- UIkit 3.16.10によるUIコンポーネント
 - GitHub Pagesによる静的サイトホスティング
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
+## 技術コンテキスト
 
-## 技術コンテキスト**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
+**言語/バージョン**: TypeScript 4.9.3、JavaScript ES2020
 
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
+**主要依存関係**: React 18.2.0、React Router 6.10.0、UIkit 3.16.10、Vite 4.2.0、Vitest 0.34.0
 
-**言語/バージョン**: TypeScript 4.9.3、JavaScript ES2020  **Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**ストレージ**: LocalStorage（ブラウザネイティブAPI、5MB制限）
 
-**主要依存関係**: React 18.2.0、React Router 6.10.0、UIkit 3.16.10、Vite 4.2.0、Vitest 0.34.0  **Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**テスト**: Vitest 0.34.0 + @testing-library/react 14.1.2 + happy-dom 12.10.3
 
-**ストレージ**: LocalStorage（ブラウザネイティブAPI、5MB制限）  **Project Type**: [single/web/mobile - determines source structure]  
+**ターゲットプラットフォーム**: モダンブラウザ（Chrome、Firefox、Safari、Edge最新版）、GitHub Pages（静的サイトホスティング）
 
-**テスト**: Vitest 0.34.0 + @testing-library/react 14.1.2 + happy-dom 12.10.3  **Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-
-**ターゲットプラットフォーム**: モダンブラウザ（Chrome、Firefox、Safari、Edge最新版）、GitHub Pages（静的サイトホスティング）  **Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-
-**プロジェクトタイプ**: Web Application（Single Page Application）  **Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**プロジェクトタイプ**: Web Application（Single Page Application）
 
 **パフォーマンス目標**: 
-
-- 初期ページ読み込み: < 2秒## Constitution Check
-
+- 初期ページ読み込み: < 2秒
 - タスク追加・削除応答: < 100ms
-
-- フィルタリング処理: < 1秒（10,000タスクまで）*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
-
+- フィルタリング処理: < 1秒（10,000タスクまで）
 - テストスイート実行: < 12秒（106テスト）
 
-[Gates determined based on constitution file]
-
 **制約条件**: 
-
-- LocalStorage容量制限: 5MB（ブラウザ依存）## Project Structure
-
+- LocalStorage容量制限: 5MB（ブラウザ依存）
 - ページ追加・編集・削除後はサーバー再起動が必要（userPages.ts手動編集のため）
-
-- クライアントサイドのみ（APIサーバーなし）### Documentation (this feature)
-
+- クライアントサイドのみ（APIサーバーなし）
 - 削除されたページのタスクデータは復元不可
 
-```text
-
-**規模/スコープ**: specs/[###-feature]/
-
-- ユーザーストーリー: 4つ（P1/P2/P3優先度付き）├── plan.md              # This file (/speckit.plan command output)
-
-- 機能要件: 10要件（FR-001〜FR-010）├── research.md          # Phase 0 output (/speckit.plan command)
-
-- テストケース: 106テスト（100%カバレッジ目標）├── data-model.md        # Phase 1 output (/speckit.plan command)
-
-- コンポーネント数: 約15コンポーネント（Atomic Design原則）├── quickstart.md        # Phase 1 output (/speckit.plan command)
-
-- 想定ページ数: 最大100ページ├── contracts/           # Phase 1 output (/speckit.plan command)
-
-- 想定タスク数: 10,000タスク/ページで動作保証└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
-
-```
+**規模/スコープ**: 
+- ユーザーストーリー: 4つ（P1/P2/P3優先度付き）
+- 機能要件: 10要件（FR-001〜FR-010）
+- テストケース: 106テスト（100%カバレッジ目標）
+- コンポーネント数: 約15コンポーネント（Atomic Design原則）
+- 想定ページ数: 最大100ページ
+- 想定タスク数: 10,000タスク/ページで動作保証
 
 ## 憲法チェック
 
-### Source Code (repository root)
+*ゲート: Phase 0 研究前に合格必須。Phase 1 設計後に再チェック。*
 
-*ゲート: Phase 0 研究前に合格必須。Phase 1 設計後に再チェック。*<!--
-
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-
-### ✅ I. テスト駆動開発の徹底  for this feature. Delete unused options and expand the chosen structure with
-
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-
-| 要件 | ステータス | 詳細 |  not include Option labels.
-
-|-----|----------|------|-->
-
-| テストファースト | ✅ 合格 | テストコードを先に作成し、Red-Green-Refactorサイクルを実施 |
-
-| 仕様対応テスト | ✅ 合格 | 機能要件（FR-001〜FR-010）すべてに対応するテストケース106件 |```text
-
-| カバレッジ目標 | ✅ 合格 | 100%カバレッジ（単体テスト+統合テスト） |# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-
-src/
-
-**検証方法**: Vitestで`npm run test`実行、カバレッジレポート生成、すべてのテストがパスすることを確認├── models/
-
-├── services/
-
-### ✅ II. セキュリティファーストの原則├── cli/
-
-└── lib/
+### ✅ I. テスト駆動開発の徹底
 
 | 要件 | ステータス | 詳細 |
-
-|-----|----------|------|tests/
-
-| 機密データ保護 | ✅ 合格 | LocalStorageには機密情報を保存しない（Todoタスクテキストのみ） |├── contract/
-
-| XSS対策 | ✅ 合格 | Reactのデフォルトエスケープ機能に依存、`dangerouslySetInnerHTML`使用禁止 |├── integration/
-
-| 入力バリデーション | ✅ 合格 | 空文字チェック、trim()処理、文字列長制限（タスク名500文字、ページ名50文字） |└── unit/
-
-| HTTPS | ✅ 合格 | GitHub Pages自動HTTPS提供 |
-
-| 依存関係脆弱性 | ✅ 合格 | `npm audit`を定期実行、脆弱性修正 |# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-
-backend/
-
-**検証方法**: セキュリティレビューチェックリスト、npm audit実行、入力バリデーションテスト├── src/
-
-│   ├── models/
-
-### ✅ III. パフォーマンス定量化の原則│   ├── services/
-
-│   └── api/
-
-| 要件 | ステータス | 詳細 |└── tests/
-
 |-----|----------|------|
+| テストファースト | ✅ 合格 | テストコードを先に作成し、Red-Green-Refactorサイクルを実施 |
+| 仕様対応テスト | ✅ 合格 | 機能要件（FR-001〜FR-010）すべてに対応するテストケース106件 |
+| カバレッジ目標 | ✅ 合格 | 100%カバレッジ（単体テスト+統合テスト） |
 
-| 成功基準定義 | ✅ 合格 | 10の測定可能な成功基準（SC-001〜SC-010）を定義 |frontend/
+**検証方法**: Vitestで`npm run test`実行、カバレッジレポート生成、すべてのテストがパスすることを確認
 
-| パフォーマンス監視 | ✅ 合格 | Chrome DevTools Performance、Lighthouse監視 |├── src/
+### ✅ II. セキュリティファーストの原則
 
-| 目標達成 | ⏳ Phase 1後確認 | 初期読み込み < 2秒、タスク操作 < 100ms、フィルタリング < 1秒 |│   ├── components/
+| 要件 | ステータス | 詳細 |
+|-----|----------|------|
+| 機密データ保護 | ✅ 合格 | LocalStorageには機密情報を保存しない（Todoタスクテキストのみ） |
+| XSS対策 | ✅ 合格 | Reactのデフォルトエスケープ機能に依存、`dangerouslySetInnerHTML`使用禁止 |
+| 入力バリデーション | ✅ 合格 | 空文字チェック、trim()処理、文字列長制限（タスク名500文字、ページ名50文字） |
+| HTTPS | ✅ 合格 | GitHub Pages自動HTTPS提供 |
+| 依存関係脆弱性 | ✅ 合格 | `npm audit`を定期実行、脆弱性修正 |
 
-│   ├── pages/
+**検証方法**: セキュリティレビューチェックリスト、npm audit実行、入力バリデーションテスト
 
-**検証方法**: Lighthouse スコア、Chrome DevTools Performance プロファイリング、成功基準検証テスト│   └── services/
+### ✅ III. パフォーマンス定量化の原則
 
-└── tests/
+| 要件 | ステータス | 詳細 |
+|-----|----------|------|
+| 成功基準定義 | ✅ 合格 | 10の測定可能な成功基準（SC-001〜SC-010）を定義 |
+| パフォーマンス監視 | ✅ 合格 | Chrome DevTools Performance、Lighthouse監視 |
+| 目標達成 | ✅ 合格 | 初期読み込み < 2秒、タスク操作 < 100ms、フィルタリング < 1秒 |
+
+**検証方法**: Lighthouse スコア、Chrome DevTools Performance プロファイリング、成功基準検証テスト
 
 ### 制約チェック
 
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-
-| 制約項目 | 現状 | 合格基準 | ステータス |api/
-
-|---------|------|---------|----------|└── [same as backend above]
-
+| 制約項目 | 現状 | 合格基準 | ステータス |
+|---------|------|---------|----------|
 | CS-001: プロジェクト数 | 1プロジェクト | ≤ 3 | ✅ 合格 |
-
-| CS-002: 依存関係数 | 主要6依存関係 | ≤ 10 | ✅ 合格 |ios/ or android/
-
-| CS-003: 抽象化レイヤー | 2層（components, utils） | ≤ 3 | ✅ 合格 |└── [platform-specific structure: feature modules, UI flows, platform tests]
-
-| CS-007: ビルド時間 | < 30秒 | ≤ 5分 | ✅ 合格 |```
-
+| CS-002: 依存関係数 | 主要6依存関係 | ≤ 10 | ✅ 合格 |
+| CS-003: 抽象化レイヤー | 2層（components, utils） | ≤ 3 | ✅ 合格 |
+| CS-007: ビルド時間 | < 30秒 | ≤ 5分 | ✅ 合格 |
 | CS-008: テスト実行時間 | < 12秒 | ≤ 1分 | ✅ 合格 |
 
-**Structure Decision**: [Document the selected structure and reference the real
-
-**総合判定**: ✅ すべての憲法要件を満たしていますdirectories captured above]
+**総合判定**: ✅ すべての憲法要件を満たしています
 
 
 
-## プロジェクト構造## Complexity Tracking
+## プロジェクト構造
 
+### ドキュメント（この機能）
 
-
-### ドキュメント（この機能）> **Fill ONLY if Constitution Check has violations that must be justified**
-
-
-
-```text| Violation | Why Needed | Simpler Alternative Rejected Because |
-
-specs/feature/impl-001-todo-app/|-----------|------------|-------------------------------------|
-
-├── plan.md              # このファイル（/speckit.plan コマンド出力）| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-
-├── research.md          # Phase 0 出力（/speckit.plan コマンド）| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
-
+```text
+specs/feature/impl-001-todo-app/
+├── plan.md              # このファイル（/speckit.plan コマンド出力）
+├── research.md          # Phase 0 出力（/speckit.plan コマンド）
 ├── data-model.md        # Phase 1 出力（/speckit.plan コマンド）
 ├── quickstart.md        # Phase 1 出力（/speckit.plan コマンド）
 ├── contracts/           # Phase 1 出力（/speckit.plan コマンド） - LocalStorageベースのためN/A
@@ -284,12 +189,115 @@ todo-app/
 
 ## 複雑性追跡
 
-> **憲法チェック違反があり、正当化が必要な場合のみ記入**
-
 現時点で憲法違反はありません。すべての制約を満たしています。
 
 ---
 
-**バージョン**: 1.0.0  
-**最終更新**: 2025-11-13  
-**ステータス**: Phase 0 準備完了（研究フェーズへ進む）
+## 関連ドキュメント
+
+### 実装計画ドキュメント（Phase 0 & 1）
+
+| ドキュメント | 目的 | 主要内容 |
+|------------|------|---------|
+| [plan.md](./plan.md) | 実装計画概要 | 技術コンテキスト、憲法チェック、プロジェクト構造 |
+| [research.md](./research.md) | 技術選択調査 | 7技術の選択理由、代替案評価、ベストプラクティス |
+| [data-model.md](./data-model.md) | データモデル | 3エンティティ定義、バリデーション、状態遷移 |
+| [quickstart.md](./quickstart.md) | 開発者ガイド | 環境構築、TDDワークフロー、トラブルシューティング |
+
+### 仕様ドキュメント（Phase -1）
+
+| ドキュメント | 目的 | 参照先 |
+|------------|------|--------|
+| [spec.md](../001-todo-app-spec/spec.md) | 機能仕様書 | ユーザーストーリー、要件、アーキテクチャ |
+| [requirements.md](../001-todo-app-spec/checklists/requirements.md) | 要件チェックリスト | 品質検証項目、完了基準 |
+
+### 技術スタック参照
+
+**詳細**: [research.md](./research.md) を参照
+
+- React 18.2.0: [research.md#1-react-1820--hooks](./research.md#1-react-1820--hooks状態管理)
+- TypeScript 4.9.3: [research.md#2-typescript-493](./research.md#2-typescript-493型安全性)
+- Vite 4.2.0: [research.md#3-vite-420](./research.md#3-vite-420ビルドツール)
+- Vitest 0.34.0: [research.md#4-vitest-0340](./research.md#4-vitest-0340テストフレームワーク)
+- LocalStorage: [research.md#5-localstorage](./research.md#5-localstorageデータ永続化)
+- UIkit 3.16.10: [research.md#6-uikit-31610](./research.md#6-uikit-31610uiコンポーネント)
+- GitHub Pages: [research.md#7-github-pages](./research.md#7-github-pagesデプロイ)
+
+### データモデル参照
+
+**詳細**: [data-model.md](./data-model.md) を参照
+
+- TodoItem: [data-model.md#1-todoitem](./data-model.md#1-todoitemタスクアイテム)
+- UserPage: [data-model.md#2-userpage](./data-model.md#2-userpageユーザーページ)
+- StorageKey: [data-model.md#3-storagekey](./data-model.md#3-storagekeyストレージキー)
+- FilterType: [data-model.md#filtertype](./data-model.md#filtertypeフィルタータイプ)
+
+### 開発ガイド参照
+
+**詳細**: [quickstart.md](./quickstart.md) を参照
+
+- 環境構築: [quickstart.md#環境構築](./quickstart.md#環境構築)
+- ワンコマンド起動: [quickstart.md#ワンコマンド起動](./quickstart.md#ワンコマンド起動)
+- TDDワークフロー: [quickstart.md#テスト駆動開発ワークフロー](./quickstart.md#テスト駆動開発tddワークフロー)
+- デプロイ: [quickstart.md#github-pagesデプロイ](./quickstart.md#github-pagesデプロイ)
+- トラブルシューティング: [quickstart.md#トラブルシューティング](./quickstart.md#トラブルシューティング)
+
+---
+
+## 実装フロー図
+
+```mermaid
+flowchart TB
+    Start([実装開始]) --> Phase0[Phase 0: 計画とリサーチ]
+    Phase0 --> Research[research.md作成]
+    Research --> Phase1[Phase 1: 設計とコントラクト]
+    Phase1 --> DataModel[data-model.md作成]
+    DataModel --> QuickStart[quickstart.md作成]
+    QuickStart --> Context[エージェントコンテキスト更新]
+    Context --> ConstitutionCheck{憲法チェック再評価}
+    ConstitutionCheck -->|合格| Phase2[Phase 2: タスク作成]
+    ConstitutionCheck -->|不合格| Review[設計見直し]
+    Review --> Phase1
+    Phase2 --> Tasks[tasks.md作成]
+    Tasks --> Implementation[実装開始]
+    Implementation --> End([完了])
+    
+    style Start fill:#e1f5e1
+    style End fill:#e1f5e1
+    style Phase0 fill:#fff4e6
+    style Phase1 fill:#fff4e6
+    style Phase2 fill:#fff4e6
+    style ConstitutionCheck fill:#ffe6e6
+```
+
+## 技術スタック概要図
+
+```mermaid
+flowchart LR
+    subgraph Frontend["フロントエンド"]
+        React[React 18.2.0<br/>Hooks] --> Router[React Router 6.10.0]
+        React --> UI[UIkit 3.16.10]
+        TypeScript[TypeScript 4.9.3] --> React
+    end
+    
+    subgraph Storage["データ永続化"]
+        LocalStorage[LocalStorage API<br/>5MB制限]
+    end
+    
+    subgraph BuildTest["ビルド & テスト"]
+        Vite[Vite 4.2.0<br/>HMR] --> Build[dist/]
+        Vitest[Vitest 0.34.0<br/>100%カバレッジ] --> Coverage[カバレッジレポート]
+    end
+    
+    subgraph Deploy["デプロイ"]
+        GHPages[GitHub Pages<br/>HTTPS自動]
+    end
+    
+    React --> LocalStorage
+    Build --> GHPages
+    
+    style Frontend fill:#e3f2fd
+    style Storage fill:#fff3e0
+    style BuildTest fill:#f3e5f5
+    style Deploy fill:#e8f5e9
+```

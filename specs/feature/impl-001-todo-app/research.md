@@ -4,6 +4,19 @@
 **プロジェクト**: Todo App - template-no-delete.tsx ベースアプリケーション  
 **目的**: 実装計画（plan.md）で使用する技術選択の根拠とベストプラクティスを調査・文書化
 
+---
+
+## 関連ドキュメント
+
+| ドキュメント | 参照先 | 関連セクション |
+|------------|--------|-------------|
+| 実装計画 | [plan.md](./plan.md) | 技術コンテキスト、憲法チェック |
+| データモデル | [data-model.md](./data-model.md) | エンティティ定義、バリデーション |
+| 開発ガイド | [quickstart.md](./quickstart.md) | 環境構築、TDDワークフロー |
+| 機能仕様書 | [spec.md](../001-todo-app-spec/spec.md) | ユーザーストーリー、要件 |
+
+---
+
 ## 調査概要
 
 本調査では、以下の技術的意思決定について、選択理由、代替案、ベストプラクティスを文書化しました。
@@ -72,6 +85,30 @@
      
      return [value, setValue] as const;
    }
+   ```
+
+4. **セキュリティ**: XSS対策（dangerouslySetInnerHTML禁止）
+   ```typescript
+   // Good: Reactのデフォルトエスケープ
+   function TaskItem({ todo }: { todo: TodoItem }) {
+     return <span>{todo.text}</span>; // 自動エスケープ
+   }
+   
+   // Bad: XSS脆弱性
+   function TaskItem({ todo }: { todo: TodoItem }) {
+     return <span dangerouslySetInnerHTML={{ __html: todo.text }} />; // 禁止
+   }
+   ```
+
+5. **パフォーマンス**: useMemoで不要な再レンダリング防止
+   ```typescript
+   const filteredTodos = useMemo(() => {
+     return todos.filter(todo => {
+       if (filter === 'all') return true;
+       if (filter === 'active') return !todo.completed;
+       return todo.completed;
+     });
+   }, [todos, filter]);
    ```
 
 ---
@@ -443,20 +480,58 @@
 
 ---
 
-## 未解決事項
+## 技術選択決定マトリクス
 
-現時点で未解決の技術的課題はありません。すべての主要技術選択について、十分な調査と代替案評価を完了しました。
+以下の表は、7つの主要技術選択の決定理由を一覧化したものです。
 
-## Phase 1への準備状況
-
-✅ **準備完了**: 以下の成果物を作成可能
-- data-model.md: TodoItem、UserPage、StorageKey エンティティ定義
-- quickstart.md: 環境構築、ビルド、テスト、デプロイ手順
-- contracts/: N/A（LocalStorageベースのため、API契約不要）
+| # | 技術領域 | 選択技術 | 主要な理由 | 却下した代替案 |
+|---|---------|---------|-----------|-------------|
+| 1 | 状態管理 | React 18.2.0 Hooks | 学習曲線が低い、既存コードベース | Redux（過剰）、Zustand（不要）、Recoil（不安定） |
+| 2 | 型安全性 | TypeScript 4.9.3 | エラー検出、IDE サポート | JavaScript（型なし）、Flow（採用率低） |
+| 3 | ビルド | Vite 4.2.0 | 高速起動、HMR、React推奨 | Webpack（複雑）、CRA（非推奨） |
+| 4 | テスト | Vitest 0.34.0 | Vite統合、Jest互換、高速 | Jest（ESM不完全）、Mocha（古い） |
+| 5 | 永続化 | LocalStorage | シンプル、サーバー不要 | IndexedDB（複雑）、Firebase（外部依存） |
+| 6 | UI | UIkit 3.16.10 | 軽量（170KB）、日本語対応 | Material-UI（重い）、Bootstrap（jQuery依存） |
+| 7 | デプロイ | GitHub Pages | 無料、自動HTTPS、Git統合 | Vercel（不要）、AWS S3（複雑） |
 
 ---
 
-**バージョン**: 1.0.0  
-**作成者**: GitHub Copilot  
-**最終更新**: 2025-11-13  
-**ステータス**: Phase 0 完了 → Phase 1 へ進む
+## 技術スタック概要図
+
+```mermaid
+flowchart TB
+    subgraph Frontend["フロントエンド"]
+        TS[TypeScript 4.9.3<br/>型安全性] --> React[React 18.2.0<br/>Hooks]
+        React --> Router[React Router 6.10.0]
+        React --> UI[UIkit 3.16.10<br/>軽量UI]
+    end
+    
+    subgraph DevBuild["開発 & ビルド"]
+        Vite[Vite 4.2.0<br/>高速HMR]
+        Vitest[Vitest 0.34.0<br/>100%カバレッジ]
+    end
+    
+    subgraph Storage["ストレージ"]
+        LS[LocalStorage<br/>5MB制限]
+    end
+    
+    subgraph Deploy["デプロイ"]
+        GH[GitHub Pages<br/>静的ホスティング]
+    end
+    
+    Frontend --> Storage
+    Frontend --> Vite
+    Vite --> Vitest
+    Vite --> GH
+    
+    style Frontend fill:#e3f2fd
+    style DevBuild fill:#f3e5f5
+    style Storage fill:#fff3e0
+    style Deploy fill:#e8f5e9
+```
+
+---
+
+## 未解決事項
+
+現時点で未解決の技術的課題はありません。すべての主要技術選択について、十分な調査と代替案評価を完了しました。

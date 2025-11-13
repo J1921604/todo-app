@@ -6,6 +6,20 @@
 
 ---
 
+## 関連ドキュメント
+
+| ドキュメント | 参照先 | 関連セクション |
+|------------|--------|-------------|
+| 実装計画 | [plan.md](./plan.md) | 技術コンテキスト、パフォーマンス目標 |
+| 技術調査 | [research.md](./research.md) | Vite、Vitest、GitHub Pages設定 |
+| データモデル | [data-model.md](./data-model.md) | エンティティ定義、バリデーション |
+| 機能仕様書 | [spec.md](../001-todo-app-spec/spec.md) | 機能要件、成功基準 |
+
+**技術スタック詳細**: [research.md](./research.md) を参照  
+**データモデル詳細**: [data-model.md](./data-model.md) を参照
+
+---
+
 ## 📋 目次
 
 1. [環境構築](#環境構築)
@@ -557,6 +571,293 @@ if (typeof Storage === 'undefined') {
 
 ---
 
+## 開発プロセス全体図
+
+```mermaid
+flowchart TB
+    Start([開発開始]) --> Clone[リポジトリクローン]
+    Clone --> Install[npm install]
+    Install --> StartDev[start.ps1実行]
+    StartDev --> DevServer[開発サーバー起動<br/>localhost:1234]
+    
+    DevServer --> Code[コーディング]
+    Code --> Test{テスト作成}
+    Test -->|Red| Impl[実装]
+    Impl -->|Green| Refactor[リファクタリング]
+    Refactor --> Test
+    
+    Test -->|完了| Build[npm run build]
+    Build --> Preview[npm run preview]
+    Preview --> Deploy[npm run deploy]
+    Deploy --> GHPages[GitHub Pages公開]
+    
+    GHPages --> End([完了])
+    
+    style Start fill:#e1f5e1
+    style Test fill:#ffe6e6
+    style Impl fill:#fff4e6
+    style Refactor fill:#e1f5ff
+    style GHPages fill:#e8f5e9
+    style End fill:#e1f5e1
+```
+
+---
+
+## FAQ（よくある質問）
+
+### Q1: ページを追加したのにサイドバーに表示されない
+
+**A**: サーバー再起動が必要です。
+
+```powershell
+# 開発サーバーを停止（Ctrl+C）
+# 再起動
+npm run dev
+```
+
+`userPages.ts`の変更はホットリロード対象外のため、必ずサーバー再起動してください。
+
+---
+
+### Q2: LocalStorageのデータが消えた
+
+**A**: 以下の原因が考えられます。
+
+1. **プライベートブラウジングモード**: 通常モードで開いてください
+2. **ブラウザキャッシュクリア**: LocalStorageも削除される場合があります
+3. **異なるドメイン**: `localhost`と`127.0.0.1`は別ドメイン扱いです
+
+**対策**: 定期的にエクスポート機能を実装（将来的な改善課題）
+
+---
+
+### Q3: テストが100%にならない
+
+**A**: カバレッジ不足の箇所を特定します。
+
+```powershell
+# カバレッジレポート生成
+npm run test:coverage
+
+# HTMLレポート確認
+Start-Process coverage/index.html
+```
+
+赤い箇所が未カバーなので、テストケース追加してください。
+
+---
+
+### Q4: ビルドは成功するがGitHub Pagesで404
+
+**A**: ベースパス設定を確認してください。
+
+```typescript
+// vite.config.ts
+export default defineConfig({
+  base: '/todo-app/', // リポジトリ名と一致させる
+});
+```
+
+```json
+// package.json
+{
+  "homepage": "https://j1921604.github.io/todo-app"
+}
+```
+
+不一致の場合、アセットのパスが壊れて404になります。
+
+---
+
+### Q5: TypeScriptエラーが消えない
+
+**A**: VSCode TypeScriptサーバーを再起動します。
+
+1. `Ctrl+Shift+P`
+2. "TypeScript: Restart TS Server"を選択
+3. 数秒待ってエラー再確認
+
+それでも消えない場合は`npm run type-check`で詳細確認してください。
+
+---
+
+### Q6: 10,000タスクでUIがフリーズする
+
+**A**: 仮想スクロールライブラリの導入を検討してください。
+
+```powershell
+npm install react-window
+```
+
+```typescript
+import { FixedSizeList } from 'react-window';
+
+function VirtualTodoList({ todos }: { todos: TodoItem[] }) {
+  return (
+    <FixedSizeList
+      height={600}
+      itemCount={todos.length}
+      itemSize={50}
+      width="100%"
+    >
+      {({ index, style }) => (
+        <div style={style}>
+          <TaskItem todo={todos[index]} />
+        </div>
+      )}
+    </FixedSizeList>
+  );
+}
+```
+
+---
+
+### Q7: npm auditで脆弱性が検出された
+
+**A**: 以下の手順で対応します。
+
+```powershell
+# 脆弱性確認
+npm audit
+
+# 自動修正（メジャーバージョンアップなし）
+npm audit fix
+
+# 強制修正（破壊的変更あり）
+npm audit fix --force
+
+# 手動アップデート
+npm update [パッケージ名]
+```
+
+重要: `npm audit fix --force`後は必ずテストを実行してください。
+
+---
+
+### Q8: start.ps1が"スクリプトの実行が無効"エラー
+
+**A**: PowerShell実行ポリシーを変更します（管理者権限不要）。
+
+```powershell
+# 現在のポリシー確認
+Get-ExecutionPolicy
+
+# ユーザースコープで変更
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# 再実行
+.\start.ps1
+```
+
+---
+
+### Q9: Vitestが遅い
+
+**A**: 以下の最適化を試してください。
+
+```typescript
+// vitest.config.ts
+export default defineConfig({
+  test: {
+    // 並列実行数を増やす
+    maxConcurrency: 10,
+    // ファイルウォッチャー無効化（CIで）
+    watch: false,
+    // グローバル設定削除（遅延読み込み）
+    globals: false
+  }
+});
+```
+
+---
+
+### Q10: デプロイ後にアセットが読み込めない
+
+**A**: GitHub Pages設定を確認してください。
+
+1. GitHubリポジトリ → **Settings** → **Pages**
+2. **Source**: `gh-pages`ブランチ選択
+3. **Custom domain**: 空白（デフォルトドメイン使用）
+4. **Enforce HTTPS**: チェック
+
+数分待ってから https://j1921604.github.io/todo-app にアクセスしてください。
+
+---
+
+## 開発Tips集
+
+### Tip 1: VSCodeスニペット活用
+
+`.vscode/react.code-snippets`:
+```json
+{
+  "React Component": {
+    "prefix": "rfc",
+    "body": [
+      "interface ${1:Component}Props {",
+      "  $2",
+      "}",
+      "",
+      "export function ${1:Component}({ $3 }: ${1:Component}Props) {",
+      "  return (",
+      "    <div>",
+      "      $0",
+      "    </div>",
+      "  );",
+      "}"
+    ]
+  }
+}
+```
+
+使用: `rfc`入力 → Tab → コンポーネント名入力
+
+---
+
+### Tip 2: Chrome DevTools活用
+
+**パフォーマンス計測**:
+1. `F12` → **Performance**タブ
+2. **Record**ボタン → タスク操作
+3. **Stop** → フレームレート確認
+4. 60fps未満の箇所を最適化
+
+**LocalStorage確認**:
+1. `F12` → **Application**タブ
+2. **Storage** → **Local Storage** → `http://localhost:1234`
+3. キーと値を直接編集可能
+
+---
+
+### Tip 3: Git フック活用
+
+`.husky/pre-commit`:
+```bash
+#!/bin/sh
+npm run lint
+npm run type-check
+npm run test
+```
+
+コミット前に自動チェック実行（エラーがあればコミット中断）。
+
+---
+
+### Tip 4: ESLintカスタムルール
+
+`.eslintrc.json`:
+```json
+{
+  "rules": {
+    "no-console": "warn",
+    "react/prop-types": "off",
+    "@typescript-eslint/no-unused-vars": "error"
+  }
+}
+```
+
+---
+
 ## その他のコマンド
 
 ```powershell
@@ -580,17 +881,3 @@ npx npm-check-updates
 ```
 
 ---
-
-## 次のステップ
-
-1. ✅ 環境構築完了 → [開発ワークフロー](#開発ワークフロー)へ
-2. ✅ 開発開始 → [テスト駆動開発](#テスト駆動開発tddワークフロー)で実装
-3. ✅ 機能完成 → [テスト実行](#テスト実行)でカバレッジ100%確認
-4. ✅ レビュー完了 → [GitHub Pagesデプロイ](#github-pagesデプロイ)で公開
-
----
-
-**バージョン**: 1.0.0  
-**作成者**: GitHub Copilot  
-**最終更新**: 2025-11-13  
-**ステータス**: Phase 1 クイックスタートガイド完了
