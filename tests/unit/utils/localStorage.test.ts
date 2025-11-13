@@ -5,8 +5,8 @@ import type { TodoItem } from '../../../src/types/todo'
 describe('localStorage utils', () => {
   const TEST_KEY = 'test-todos' as const
   const mockTodos: TodoItem[] = [
-    { id: 1, text: 'タスク1', completed: false, createdAt: new Date('2024-01-01') },
-    { id: 2, text: 'タスク2', completed: true, createdAt: new Date('2024-01-02') }
+    { id: 1, text: 'タスク1', completed: false, createdAt: new Date('2024-01-01').toISOString() },
+    { id: 2, text: 'タスク2', completed: true, createdAt: new Date('2024-01-02').toISOString() }
   ]
 
   beforeEach(() => {
@@ -40,7 +40,7 @@ describe('localStorage utils', () => {
       const loaded = loadTodos(TEST_KEY)
       expect(loaded).toHaveLength(2)
       expect(loaded[0].text).toBe('タスク1')
-      expect(loaded[0].createdAt).toBeInstanceOf(Date)
+      expect(typeof loaded[0].createdAt).toBe('string')
     })
 
     test('データが存在しない場合は空配列を返す', () => {

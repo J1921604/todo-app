@@ -14,7 +14,7 @@ describe('validateTodoItem', () => {
       id: 1,
       text: 'テストタスク',
       completed: false,
-      createdAt: new Date()
+      createdAt: new Date().toISOString()
     }
     expect(validateTodoItem(valid)).toBe(true)
   })
@@ -24,7 +24,7 @@ describe('validateTodoItem', () => {
       id: -1,
       text: 'テスト',
       completed: false,
-      createdAt: new Date()
+      createdAt: new Date().toISOString()
     }
     expect(validateTodoItem(invalid)).toBe(false)
   })
@@ -34,7 +34,7 @@ describe('validateTodoItem', () => {
       id: 0,
       text: 'テスト',
       completed: false,
-      createdAt: new Date()
+      createdAt: new Date().toISOString()
     }
     expect(validateTodoItem(invalid)).toBe(false)
   })
@@ -44,7 +44,7 @@ describe('validateTodoItem', () => {
       id: 1,
       text: '',
       completed: false,
-      createdAt: new Date()
+      createdAt: new Date().toISOString()
     }
     expect(validateTodoItem(invalid)).toBe(false)
   })
@@ -54,7 +54,7 @@ describe('validateTodoItem', () => {
       id: 1,
       text: 'a'.repeat(501),
       completed: false,
-      createdAt: new Date()
+      createdAt: new Date().toISOString()
     }
     expect(validateTodoItem(invalid)).toBe(false)
   })
@@ -64,7 +64,7 @@ describe('validateTodoItem', () => {
       id: 1,
       text: 'テスト',
       completed: 'false' as any,
-      createdAt: new Date()
+      createdAt: new Date().toISOString()
     }
     expect(validateTodoItem(invalid)).toBe(false)
   })
@@ -79,12 +79,12 @@ describe('validateTodoItem', () => {
     expect(validateTodoItem(invalid)).toBe(false)
   })
   
-  test('無効なDate（NaN）を拒否', () => {
+  test('無効なDate(NaN)を拒否', () => {
     const invalid = {
       id: 1,
       text: 'テスト',
       completed: false,
-      createdAt: new Date('invalid')
+      createdAt: 'Invalid Date String'
     }
     expect(validateTodoItem(invalid)).toBe(false)
   })
@@ -92,10 +92,10 @@ describe('validateTodoItem', () => {
 
 describe('filterTodos', () => {
   const todos: TodoItem[] = [
-    { id: 1, text: 'タスク1', completed: false, createdAt: new Date() },
-    { id: 2, text: 'タスク2', completed: true, createdAt: new Date() },
-    { id: 3, text: 'タスク3', completed: false, createdAt: new Date() },
-    { id: 4, text: 'タスク4', completed: true, createdAt: new Date() }
+    { id: 1, text: 'タスク1', completed: false, createdAt: new Date().toISOString() },
+    { id: 2, text: 'タスク2', completed: true, createdAt: new Date().toISOString() },
+    { id: 3, text: 'タスク3', completed: false, createdAt: new Date().toISOString() },
+    { id: 4, text: 'タスク4', completed: true, createdAt: new Date().toISOString() }
   ]
   
   test('allフィルターはすべてのタスクを返す', () => {
@@ -149,9 +149,9 @@ describe('calculateTodoStats', () => {
   
   test('タスク混在で正しい統計を返す', () => {
     const todos: TodoItem[] = [
-      { id: 1, text: 'タスク1', completed: false, createdAt: new Date() },
-      { id: 2, text: 'タスク2', completed: true, createdAt: new Date() },
-      { id: 3, text: 'タスク3', completed: false, createdAt: new Date() }
+      { id: 1, text: 'タスク1', completed: false, createdAt: new Date().toISOString() },
+      { id: 2, text: 'タスク2', completed: true, createdAt: new Date().toISOString() },
+      { id: 3, text: 'タスク3', completed: false, createdAt: new Date().toISOString() }
     ]
     const stats = calculateTodoStats(todos)
     expect(stats).toEqual({ total: 3, active: 2, completed: 1 })
@@ -159,8 +159,8 @@ describe('calculateTodoStats', () => {
   
   test('すべて完了タスクで正しい統計を返す', () => {
     const todos: TodoItem[] = [
-      { id: 1, text: 'タスク1', completed: true, createdAt: new Date() },
-      { id: 2, text: 'タスク2', completed: true, createdAt: new Date() }
+      { id: 1, text: 'タスク1', completed: true, createdAt: new Date().toISOString() },
+      { id: 2, text: 'タスク2', completed: true, createdAt: new Date().toISOString() }
     ]
     const stats = calculateTodoStats(todos)
     expect(stats).toEqual({ total: 2, active: 0, completed: 2 })

@@ -29,7 +29,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ todo, onToggle, onDelete }) => {
         {todo.text}
       </span>
       <span style={{ fontSize: '12px', color: '#888' }}>
-        {todo.createdAt.toLocaleDateString()}
+        {new Date(todo.createdAt).toLocaleDateString()}
       </span>
       <ButtonSmall
         onClick={() => onDelete(todo.id)}
@@ -46,7 +46,7 @@ describe('TaskItem Component Tests (US1)', () => {
     id: 1,
     text: 'テストタスク',
     completed: false,
-    createdAt: new Date('2025-11-06'),
+    createdAt: new Date('2025-11-06').toISOString(),
   }
 
   it('タスクテキストが正しく表示される', () => {

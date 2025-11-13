@@ -40,11 +40,8 @@ export function loadTodos(key: StorageKey): TodoItem[] {
       return []
     }
 
-    // Date文字列をDateオブジェクトに復元
-    return parsed.map((item: any) => ({
-      ...item,
-      createdAt: new Date(item.createdAt)
-    }))
+    // createdAtはISO 8601文字列として保持
+    return parsed
   } catch (error) {
     console.error(`Failed to load todos from localStorage (key: ${key}):`, {
       error: error instanceof Error ? error.message : 'Unknown error'

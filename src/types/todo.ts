@@ -18,8 +18,8 @@ export interface TodoItem {
   /** 完了状態フラグ */
   completed: boolean
   
-  /** 作成日時 */
-  createdAt: Date
+  /** 作成日時（ISO 8601形式） */
+  createdAt: string
 }
 
 /**
@@ -40,16 +40,38 @@ export type StorageKey = `${string}-todos`
  * @returns itemがTodoItem型として有効な場合true
  */
 export function validateTodoItem(item: any): item is TodoItem {
-  return (
-    typeof item.id === 'number' &&
-    item.id > 0 &&
-    typeof item.text === 'string' &&
-    item.text.length > 0 &&
-    item.text.length <= 500 &&
-    typeof item.completed === 'boolean' &&
-    item.createdAt instanceof Date &&
-    !isNaN(item.createdAt.getTime())
-  )
+  if (typeof item !== 'object' || item === null) return false;
+  
+  const todo = item as Record<string, unknown>;
+  
+  // id: 正の整数
+  if (typeof todo.id !== 'number' || !Number.isInteger(todo.id) || todo.id <= 0) {
+    return false;
+  }
+  
+  // text: 1〜500文字（trim後）
+  if (typeof todo.text !== 'string' || todo.text.trim().length === 0) {
+    return false;
+  }
+  if (todo.text.length > 500) {
+    return false;
+  }
+  
+  // completed: boolean
+  if (typeof todo.completed !== 'boolean') {
+    return false;
+  }
+  
+  // createdAt: ISO 8601形式の文字列
+  if (typeof todo.createdAt !== 'string') {
+    return false;
+  }
+  const date = new Date(todo.createdAt);
+  if (isNaN(date.getTime())) {
+    return false;
+  }
+  
+  return true;
 }
 
 /**

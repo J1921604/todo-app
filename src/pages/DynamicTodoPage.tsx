@@ -31,12 +31,7 @@ const DynamicTodoPage: React.FC<DynamicTodoPageProps> = ({ userName }) => {
     if (savedTodos) {
       try {
         const parsedTodos = JSON.parse(savedTodos)
-        setTodos(
-          parsedTodos.map((todo: any) => ({
-            ...todo,
-            createdAt: new Date(todo.createdAt),
-          }))
-        )
+        setTodos(parsedTodos)
       } catch (error) {
         console.error('Failed to load todos from localStorage:', error)
       }
@@ -62,7 +57,7 @@ const DynamicTodoPage: React.FC<DynamicTodoPageProps> = ({ userName }) => {
       id: Date.now(),
       text: inputText.trim(),
       completed: false,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     }
 
     setTodos((prev) => [...prev, newTodo])
@@ -247,7 +242,7 @@ const DynamicTodoPage: React.FC<DynamicTodoPageProps> = ({ userName }) => {
                     marginRight: '12px',
                   }}
                 >
-                  {todo.createdAt.toLocaleDateString()}
+                  {new Date(todo.createdAt).toLocaleDateString()}
                 </span>
 
                 {/* 削除ボタン */}
