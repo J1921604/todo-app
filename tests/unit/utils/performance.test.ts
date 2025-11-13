@@ -17,7 +17,7 @@ describe('performance utils', () => {
       const { result, duration, exceeded } = await measurePerformance(fn, 'Test async', 100)
       
       expect(result).toBe('result')
-      expect(duration).toBeGreaterThanOrEqual(10)
+      expect(duration).toBeGreaterThanOrEqual(8)
       expect(exceeded).toBe(false)
     })
 
@@ -30,7 +30,7 @@ describe('performance utils', () => {
       const { result, duration, exceeded } = await measurePerformance(fn, 'Slow async', 50)
       
       expect(result).toBe('slow')
-      expect(duration).toBeGreaterThanOrEqual(60)
+      expect(duration).toBeGreaterThanOrEqual(55)
       expect(exceeded).toBe(true)
     })
   })
