@@ -4,12 +4,12 @@
 
 1. ✅ GitHub Actionsワークフロー作成済み (`.github/workflows/deploy.yml`)
 2. ✅ Vite設定でGitHub Pagesのbaseパス設定済み (`/todo-app/`)
-3. ✅ gh-pagesブランチ存在確認済み（リモートに存在）
-4. ✅ mainブランチにプッシュ済み（自動デプロイトリガー）
+3. ✅ gh-pagesブランチにデプロイ済み（最新ビルド）
+4. ✅ package-lock.json追加済み
+5. ✅ .nojekyllファイル追加済み
+6. ✅ 全106テスト通過
 
-## 🔧 手動でGitHub Pages設定が必要な手順
-
-以下の手順でGitHub Pagesを有効化してください：
+## 🔧 今すぐ必要な手動設定
 
 ### ステップ1: GitHubリポジトリにアクセス
 
@@ -23,14 +23,17 @@ https://github.com/J1921604/todo-app
 
 左サイドバーから「Pages」を選択
 
-### ステップ4: ソース設定
+### ステップ4: ソース設定（重要！）
 
 **Build and deployment** セクションで以下を設定：
 
-- **Source**: `GitHub Actions` を選択（重要！）
+- **Source**: `Deploy from a branch` を選択
+- **Branch**: `gh-pages` を選択
+- **Folder**: `/ (root)` を選択
+- **Save** ボタンをクリック
 
-**注意**: `Deploy from a branch` ではなく `GitHub Actions` を選択してください。
-これにより、GitHub Actionsワークフローが自動的にデプロイを管理します。
+**注意**: `GitHub Actions` ではなく `Deploy from a branch` を選択してください。
+これは `peaceiris/actions-gh-pages@v3` を使用しているためです。
 
 ### ステップ5: Actions権限設定（必要な場合）
 
