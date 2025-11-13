@@ -7,7 +7,7 @@ export interface ButtonProps {
   style?: React.CSSProperties
 }
 
-export const Small: React.FC<ButtonProps> = ({
+export const Small = React.memo<ButtonProps>(({
   onClick,
   children,
   disabled = false,
@@ -32,4 +32,4 @@ export const Small: React.FC<ButtonProps> = ({
       {children}
     </button>
   )
-}
+})

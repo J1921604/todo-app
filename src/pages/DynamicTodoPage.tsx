@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { Text as InputText } from '../components/atoms/Input/Text'
 import { Small as ButtonSmall, Middle as ButtonMiddle } from '../components/atoms/Button'
 import type { TodoItem, FilterType } from '../types/todo'
@@ -50,7 +50,7 @@ const DynamicTodoPage: React.FC<DynamicTodoPageProps> = ({ userName }) => {
   }, [todos, STORAGE_KEY, isLoaded])
 
   // 新しいタスクを追加
-  const addTodo = () => {
+  const addTodo = useCallback(() => {
     if (!inputText.trim()) return
 
     const newTodo: TodoItem = {
@@ -62,42 +62,44 @@ const DynamicTodoPage: React.FC<DynamicTodoPageProps> = ({ userName }) => {
 
     setTodos((prev) => [...prev, newTodo])
     setInputText('')
-  }
+  }, [inputText])
 
   // 完了状態を切り替え
-  const toggleTodo = (id: number) => {
+  const toggleTodo = useCallback((id: number) => {
     setTodos((prev) =>
       prev.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
       )
     )
-  }
+  }, [])
 
   // 個別タスクを削除
-  const deleteTodo = (id: number) => {
+  const deleteTodo = useCallback((id: number) => {
     setTodos((prev) => prev.filter((todo) => todo.id !== id))
-  }
+  }, [])
 
   // 完了タスクを一括削除
-  const clearCompleted = () => {
+  const clearCompleted = useCallback(() => {
     setTodos((prev) => prev.filter((todo) => !todo.completed))
-  }
+  }, [])
 
-  // タスクをフィルタリング
-  const filteredTodos = todos.filter((todo) => {
-    switch (filter) {
-      case 'active':
-        return !todo.completed
-      case 'completed':
-        return todo.completed
-      default:
-        return true
-    }
-  })
+  // タスクをフィルタリング（useMemoで最適化）
+  const filteredTodos = useMemo(() => {
+    return todos.filter((todo) => {
+      switch (filter) {
+        case 'active':
+          return !todo.completed
+        case 'completed':
+          return todo.completed
+        default:
+          return true
+      }
+    })
+  }, [todos, filter])
 
-  // 統計
-  const activeCount = todos.filter((todo) => !todo.completed).length
-  const completedCount = todos.filter((todo) => todo.completed).length
+  // 統計（useMemoで最適化）
+  const activeCount = useMemo(() => todos.filter((todo) => !todo.completed).length, [todos])
+  const completedCount = useMemo(() => todos.filter((todo) => todo.completed).length, [todos])
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {

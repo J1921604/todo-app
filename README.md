@@ -12,6 +12,12 @@
 
 **ライブデモ**: [https://j1921604.github.io/todo-app/](https://j1921604.github.io/todo-app/)
 
+**スクリーンショット**:
+
+![Todo App Screenshot](https://via.placeholder.com/800x450.png?text=Todo+App+Screenshot)
+
+**機能紹介動画**: 準備中
+
 ## ✨ 機能
 
 ### 🎯 コア機能
