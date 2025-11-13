@@ -1,187 +1,196 @@
-# GitHub Pagesデプロイ手順
+# GitHub Pages デプロイ手順
 
 **プロジェクト**: Todo App  
 **リポジトリ**: https://github.com/J1921604/todo-app  
-**デプロイURL**: https://j1921604.github.io/todo-app/
+**デプロイURL**: https://j1921604.github.io/todo-app/  
+**最終更新**: 2025年11月13日
 
 ---
 
 ## 📋 目次
 
-1. [自動デプロイ（GitHub Actions）](#自動デプロイgithub-actions)
-2. [手動デプロイ（ローカル）](#手動デプロイローカル)
-3. [初回設定](#初回設定)
+1. [自動デプロイ（推奨）](#自動デプロイ推奨)
+2. [手動デプロイ](#手動デプロイ)
+3. [GitHub Pages設定](#github-pages設定)
 4. [トラブルシューティング](#トラブルシューティング)
-5. [デプロイ検証](#デプロイ検証)
+5. [デプロイ確認](#デプロイ確認)
 
 ---
 
-## 🤖 自動デプロイ（GitHub Actions）
+## 自動デプロイ（推奨）
+
+GitHub Actionsを使用した自動デプロイです。**mainブランチにプッシュするだけ**でデプロイされます。
 
 ### 前提条件
 
-- GitHubリポジトリが作成済み
-- リポジトリのSettings → Pagesが有効化済み
+- ✅ `.github/workflows/deploy.yml` が存在する
+- ✅ `gh-pages` ブランチが存在する
+- ✅ GitHub Pagesの設定が完了している
 
-### 自動デプロイの仕組み
-
-GitHub Actionsワークフローが以下のブランチへのプッシュを検知して、自動的にビルド・デプロイを実行します：
-
-- `main` ブランチ
-- `deploy` ブランチ
-
-### ワークフローの実行手順
-
-#### 1. コードをプッシュ
+### デプロイ手順
 
 ```powershell
-# 変更をコミット
+# 1. 変更をコミット
 git add .
 git commit -m "feat: 新機能を追加"
 
-# mainまたはdeployブランチにプッシュ
+# 2. mainブランチにプッシュ
 git push origin main
-# または
-git push origin deploy
+
+# 3. GitHub Actionsが自動実行される（約2-3分）
+# https://github.com/J1921604/todo-app/actions で進捗確認
+
+# 4. デプロイ完了後、URLにアクセス
+# https://j1921604.github.io/todo-app/
 ```
 
-#### 2. GitHub Actionsの確認
-
-1. GitHubリポジトリのページを開く
-2. 「Actions」タブをクリック
-3. 最新のワークフロー実行を確認
-
-ワークフローは以下のステップを実行します：
-
-```mermaid
-flowchart LR
-    A[コードチェックアウト] --> B[Node.js セットアップ]
-    B --> C[依存関係インストール]
-    C --> D[テスト実行]
-    D --> E{テスト成功?}
-    E -->|はい| F[ビルド実行]
-    E -->|いいえ| G[❌ デプロイ中止]
-    F --> H[成果物アップロード]
-    H --> I[GitHub Pagesへデプロイ]
-    I --> J[✅ デプロイ完了]
-    
-    style A fill:#e1f5ff
-    style D fill:#fff4e1
-    style F fill:#e1ffe1
-    style I fill:#f5e1ff
-    style J fill:#e1fff4
-    style G fill:#ffe1e1
-```
-
-#### 3. デプロイ完了の確認
-
-- ワークフローが正常に完了すると、GitHub PagesのURLが更新されます
-- デプロイURL: https://j1921604.github.io/todo-app/
-- 通常、2-5分でデプロイが完了します
-
-### 手動トリガー（workflow_dispatch）
-
-GitHub UIから手動でワークフローを実行できます：
-
-1. GitHubリポジトリの「Actions」タブを開く
-2. 左側のメニューから「Deploy to GitHub Pages」を選択
-3. 「Run workflow」ボタンをクリック
-4. ブランチを選択して「Run workflow」を実行
-
----
-
-## 🖥️ 手動デプロイ（ローカル）
-
-### 前提条件
-
-- Node.js 18以上がインストール済み
-- GitHubリポジトリへのプッシュ権限がある
-
-### 手動デプロイ手順
-
-#### 1. 依存関係のインストール
-
-```powershell
-npm install
-```
-
-#### 2. テストの実行
-
-```powershell
-npm test -- --run
-```
-
-すべてのテストが通過することを確認してください。
-
-#### 3. ビルドの実行
-
-```powershell
-npm run build
-```
-
-`dist/` ディレクトリにビルド成果物が生成されます。
-
-#### 4. ローカルでプレビュー（オプション）
-
-```powershell
-npm run preview
-```
-
-http://localhost:4173 でビルド成果物をプレビューできます。
-
-#### 5. 手動デプロイ（gh-pagesブランチ）
-
-```powershell
-# gh-pagesライブラリを使用してデプロイ
-npx gh-pages -d dist -b gh-pages
-```
-
-このコマンドは以下を実行します：
-
-1. `dist/` ディレクトリの内容を `gh-pages` ブランチにコミット
-2. GitHubリポジトリの `gh-pages` ブランチにプッシュ
-3. GitHub Pagesが自動的に更新を検知してデプロイ
-
----
-
-## ⚙️ 初回設定
-
-### 1. GitHubリポジトリの作成
-
-```powershell
-# 既存のリポジトリをクローン
-git clone https://github.com/J1921604/todo-app.git
-cd todo-app
-
-# または、新規リポジトリを作成
-git init
-git remote add origin https://github.com/J1921604/todo-app.git
-```
-
-### 2. GitHub Pages設定の有効化
-
-#### 方法A: GitHub UI から設定（推奨）
-
-1. GitHubリポジトリのページを開く
-2. 「Settings」タブをクリック
-3. 左側のメニューから「Pages」を選択
-4. 「Source」で「GitHub Actions」を選択
-5. 保存
-
-#### 方法B: リポジトリ設定ファイル（.github/workflows/deploy.yml）
-
-すでに作成されたワークフローファイルが以下の設定を含んでいます：
+### GitHub Actionsワークフローの動作
 
 ```yaml
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+トリガー: mainブランチへのプッシュ
+↓
+1. Checkout（コード取得）
+↓
+2. Node.js 18セットアップ
+↓
+3. npm ci（依存関係インストール）
+↓
+4. npm test（テスト実行）
+↓
+5. npm run build（ビルド実行）
+↓
+6. Upload artifact（成果物アップロード）
+↓
+7. Deploy to GitHub Pages（gh-pagesブランチにデプロイ）
 ```
 
-### 3. vite.config.ts のbase設定確認
+### デプロイ状況の確認
 
-`vite.config.ts` で正しいベースパスが設定されていることを確認：
+1. GitHubリポジトリにアクセス: https://github.com/J1921604/todo-app
+2. **Actions** タブをクリック
+3. 最新のワークフロー実行を確認
+4. ✅ 緑色のチェックマーク = デプロイ成功
+5. ❌ 赤色のXマーク = デプロイ失敗（ログを確認）
+
+---
+
+## 手動デプロイ
+
+自動デプロイが利用できない場合の手動デプロイ手順です。
+
+### 方法1: GitHub CLIを使用（簡単）
+
+```powershell
+# 1. ビルド実行
+npm run build
+
+# 2. distフォルダをgh-pagesブランチにデプロイ
+npx gh-pages -d dist -b gh-pages
+
+# 3. 完了（約1分で反映）
+```
+
+### 方法2: 手動でgh-pagesブランチを更新（詳細）
+
+```powershell
+# 1. ビルド実行
+npm run build
+
+# 2. 現在のブランチを保存
+git stash
+
+# 3. gh-pagesブランチに切り替え
+git checkout gh-pages
+
+# 4. distフォルダの内容をコピー
+Copy-Item -Path dist\* -Destination . -Recurse -Force
+
+# 5. コミット
+git add .
+git commit -m "deploy: 手動デプロイ $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+
+# 6. プッシュ
+git push origin gh-pages
+
+# 7. mainブランチに戻る
+git checkout main
+git stash pop
+```
+
+---
+
+## GitHub Pages設定
+
+初回デプロイ時、または設定を変更する場合の手順です。
+
+### 設定手順
+
+1. **GitHubリポジトリにアクセス**  
+   https://github.com/J1921604/todo-app
+
+2. **Settings タブをクリック**
+
+3. **左サイドバーから Pages を選択**
+
+4. **Source（ソース）を設定**
+   - **Source**: Deploy from a branch
+   - **Branch**: `gh-pages`
+   - **Folder**: `/ (root)`
+   - **Save** をクリック
+
+5. **設定完了確認**
+   - 数分後、ページ上部に以下のメッセージが表示されます：
+   - ✅ "Your site is live at https://j1921604.github.io/todo-app/"
+
+### カスタムドメイン設定（オプション）
+
+独自ドメインを使用する場合：
+
+1. **Custom domain** 欄に独自ドメインを入力
+2. **Save** をクリック
+3. DNSレコードを設定（A/CNAMEレコード）
+4. **Enforce HTTPS** にチェック
+
+---
+
+## トラブルシューティング
+
+### 問題1: GitHub Actionsが失敗する
+
+**症状**: Actionsタブで赤いXマークが表示される
+
+**原因と解決策**:
+
+```powershell
+# テストが失敗している場合
+npm test -- --run
+
+# ビルドが失敗している場合
+npm run build
+
+# エラーメッセージを確認して修正
+```
+
+### 問題2: デプロイ後404エラー
+
+**症状**: https://j1921604.github.io/todo-app/ にアクセスすると404エラー
+
+**原因**: GitHub Pages設定が正しくない、またはビルドファイルがない
+
+**解決策**:
+1. Settings > Pages で `gh-pages` ブランチが選択されているか確認
+2. `gh-pages` ブランチに `index.html` が存在するか確認
+3. 数分待ってから再アクセス（反映に時間がかかる場合あり）
+
+### 問題3: ページは表示されるがルーティングが動作しない
+
+**症状**: ホームページは表示されるが、直接URL入力すると404エラー
+
+**原因**: SPAのクライアントサイドルーティング対応が必要
+
+**解決策**:
+
+`vite.config.ts` で `base` パスが正しく設定されているか確認：
 
 ```typescript
 export default defineConfig({
@@ -190,195 +199,166 @@ export default defineConfig({
 })
 ```
 
-**重要**: リポジトリ名が `todo-app` と一致していることを確認してください。
+### 問題4: CSSやJSが読み込まれない
 
-### 4. 初回デプロイ
+**症状**: ページは表示されるがスタイルが適用されない
+
+**原因**: `base` パスの設定ミス
+
+**解決策**:
+1. `vite.config.ts` の `base` を確認
+2. ビルドを再実行: `npm run build`
+3. 再デプロイ: `git push origin main`
+
+### 問題5: 権限エラー（Permission denied）
+
+**症状**: GitHub Actionsで `permission denied` エラー
+
+**解決策**:
+1. Settings > Actions > General
+2. **Workflow permissions** を **Read and write permissions** に変更
+3. **Save** をクリック
+
+---
+
+## デプロイ確認
+
+デプロイが正常に完了したか確認する手順です。
+
+### 確認チェックリスト
+
+- [ ] GitHub Actionsのワークフローが成功（✅緑色）
+- [ ] https://j1921604.github.io/todo-app/ にアクセス可能
+- [ ] ホームページが正しく表示される
+- [ ] サイドバーのナビゲーションが動作する
+- [ ] Todoページでタスクの追加・削除・完了切り替えが動作する
+- [ ] ページリロード後もデータが保持される（LocalStorage）
+- [ ] レスポンシブデザインが正しく表示される（モバイル対応）
+
+### 動作確認コマンド
 
 ```powershell
-# mainブランチにプッシュして自動デプロイをトリガー
-git add .
-git commit -m "chore: initial deployment setup"
-git push origin main
+# ローカルでプロダクションビルドをプレビュー
+npm run build
+npm run preview
+
+# ブラウザで http://localhost:4173 にアクセス
+# 本番環境と同じ動作を確認できます
+```
+
+### パフォーマンス確認
+
+Chrome DevToolsでパフォーマンスを測定：
+
+1. `F12` でDevToolsを開く
+2. **Lighthouse** タブを選択
+3. **Generate report** をクリック
+4. 目標値：
+   - Performance: > 90
+   - Accessibility: > 90
+   - Best Practices: > 90
+   - SEO: > 80
+
+---
+
+## デプロイフロー全体図
+
+```mermaid
+flowchart TD
+    A[コード変更] --> B[git commit]
+    B --> C[git push origin main]
+    C --> D[GitHub Actions トリガー]
+    D --> E[依存関係インストール]
+    E --> F[テスト実行]
+    F --> G{テスト成功?}
+    G -->|Yes| H[ビルド実行]
+    G -->|No| I[デプロイ失敗]
+    H --> J[成果物アップロード]
+    J --> K[GitHub Pagesデプロイ]
+    K --> L[gh-pagesブランチ更新]
+    L --> M[サイト公開]
+    M --> N[https://j1921604.github.io/todo-app/]
+    
+    style A fill:#e1f5ff
+    style D fill:#fff4e1
+    style F fill:#ffe1e1
+    style H fill:#e1ffe1
+    style N fill:#f5e1ff
+    style I fill:#ffcccc
 ```
 
 ---
 
-## 🔧 トラブルシューティング
+## よくある質問（FAQ）
 
-### 問題1: デプロイ後、ページが404エラーになる
+### Q1: デプロイにどれくらい時間がかかりますか？
 
-**原因**: `base` パスの設定が間違っている
+**A**: GitHub Actionsのワークフロー実行は約2-3分、GitHub Pagesへの反映は追加で1-2分かかります。合計で3-5分程度です。
 
-**解決策**:
-1. `vite.config.ts` の `base` 設定を確認
-2. リポジトリ名と一致しているか確認
-3. リポジトリ名が `todo-app` の場合、`base: '/todo-app/'` とする
+### Q2: mainブランチ以外からデプロイできますか？
 
-### 問題2: GitHub Actionsワークフローが失敗する
+**A**: はい。`.github/workflows/deploy.yml` で `branches` に追加すればデプロイ可能です：
 
-**原因**: テストが失敗している、またはビルドエラー
-
-**解決策**:
-1. ローカルでテストを実行: `npm test -- --run`
-2. ローカルでビルドを実行: `npm run build`
-3. エラーメッセージを確認して修正
-4. 再度プッシュ
-
-### 問題3: デプロイは成功したが、最新の変更が反映されない
-
-**原因**: ブラウザキャッシュ、またはGitHub Pagesの更新遅延
-
-**解決策**:
-1. ブラウザのキャッシュをクリア（Ctrl+Shift+R）
-2. 5-10分待ってから再度確認
-3. シークレットモードで開いて確認
-
-### 問題4: GitHub Pagesの設定が見つからない
-
-**原因**: リポジトリが公開設定になっていない、または権限不足
-
-**解決策**:
-1. リポジトリが「Public」になっているか確認
-2. Settings → Pagesが表示されない場合、リポジトリの可視性を「Public」に変更
-3. 組織のリポジトリの場合、GitHub Pages機能が有効化されているか管理者に確認
-
-### 問題5: `gh-pages` ブランチへのプッシュに失敗する
-
-**原因**: 権限不足、またはブランチ保護ルール
-
-**解決策**:
-1. GitHubリポジトリへのプッシュ権限があるか確認
-2. Settings → Branches で `gh-pages` ブランチの保護ルールを確認
-3. 必要に応じて保護ルールを無効化または例外を追加
-
----
-
-## ✅ デプロイ検証
-
-### 自動デプロイの検証手順
-
-1. **ワークフローの成功確認**
-   - GitHub Actions タブで最新のワークフローが緑色のチェックマークになっているか確認
-
-2. **デプロイURLへのアクセス**
-   - https://j1921604.github.io/todo-app/ を開く
-   - ホームページが正しく表示されるか確認
-
-3. **機能の動作確認**
-   - サイドバーからページを追加
-   - タスクの追加・完了切り替え・削除が動作するか確認
-   - フィルター機能が動作するか確認
-   - ページをリロードしてデータが保持されるか確認
-
-4. **ブラウザコンソールのエラー確認**
-   - F12を押して開発者ツールを開く
-   - Consoleタブでエラーがないか確認
-
-### 手動デプロイの検証手順
-
-1. **ビルドの成功確認**
-   ```powershell
-   npm run build
-   # エラーがないことを確認
-   ```
-
-2. **ローカルプレビュー**
-   ```powershell
-   npm run preview
-   ```
-   - http://localhost:4173 で動作確認
-
-3. **デプロイ実行**
-   ```powershell
-   npx gh-pages -d dist -b gh-pages
-   ```
-   - 正常に完了したことを確認
-
-4. **デプロイ後の動作確認**
-   - 上記「自動デプロイの検証手順」のステップ2-4と同じ
-
----
-
-## 📊 デプロイステータス
-
-### 現在の設定
-
-| 項目 | 設定値 |
-|------|--------|
-| リポジトリ | https://github.com/J1921604/todo-app |
-| デプロイURL | https://j1921604.github.io/todo-app/ |
-| 自動デプロイ | ✅ 有効（main, deploy ブランチ） |
-| テスト実行 | ✅ デプロイ前に自動実行 |
-| ベースパス | `/todo-app/` |
-| Node.jsバージョン | 18 |
-
-### デプロイ履歴の確認
-
-GitHubリポジトリの「Actions」タブで過去のデプロイ履歴を確認できます：
-
-- 成功したデプロイ: 緑色のチェックマーク ✅
-- 失敗したデプロイ: 赤色のXマーク ❌
-- 実行中のデプロイ: 黄色の円 🟡
-
----
-
-## 🚀 デプロイのベストプラクティス
-
-### 1. デプロイ前のチェックリスト
-
-- [ ] すべてのテストが通過している
-- [ ] ローカルでビルドが成功している
-- [ ] コードレビューが完了している
-- [ ] 変更内容をコミットメッセージに明記している
-
-### 2. ブランチ戦略
-
-- `main`: 本番環境に反映される安定版
-- `deploy`: デプロイテスト用（必要に応じて）
-- `feature/*`: 機能開発用（自動デプロイされない）
-
-### 3. デプロイのタイミング
-
-- 新機能の実装完了後
-- バグ修正後
-- ドキュメント更新後
-
-### 4. ロールバック手順
-
-問題が発生した場合、以前のコミットに戻す：
-
-```powershell
-# 前回のコミットに戻す
-git revert HEAD
-git push origin main
-
-# 特定のコミットに戻す
-git revert <commit-hash>
-git push origin main
+```yaml
+on:
+  push:
+    branches:
+      - main
+      - deploy  # 追加
+      - develop # 追加
 ```
 
+### Q3: デプロイを一時的に無効化できますか？
+
+**A**: はい。以下の方法があります：
+
+1. **ワークフローを無効化**: Settings > Actions > Workflows > deploy.yml > Disable workflow
+2. **ブランチ保護**: Settings > Branches > Add rule で main を保護
+3. **ファイル削除**: `.github/workflows/deploy.yml` を一時的に削除
+
+### Q4: 複数の環境（staging、production）にデプロイできますか？
+
+**A**: はい。ブランチごとに異なるワークフローを作成することで可能です：
+
+- `main` → 本番環境（https://j1921604.github.io/todo-app/）
+- `staging` → ステージング環境（別のGitHub Pagesまたは他のホスティング）
+
+### Q5: デプロイ履歴を確認できますか？
+
+**A**: はい。以下の方法で確認できます：
+
+1. **GitHub Actions**: Actions タブで全デプロイ履歴を確認
+2. **gh-pagesブランチ**: コミット履歴でデプロイ日時を確認
+3. **GitHub Pages**: Settings > Pages でデプロイ状況を確認
+
 ---
 
-## 📚 関連ドキュメント
+## まとめ
 
-- [GitHub Pages 公式ドキュメント](https://docs.github.com/ja/pages)
-- [GitHub Actions 公式ドキュメント](https://docs.github.com/ja/actions)
-- [Vite デプロイガイド](https://ja.vitejs.dev/guide/static-deploy.html)
-- [プロジェクトREADME](../README.md)
+### 推奨デプロイフロー
+
+**日常の開発**:
+1. 機能を実装
+2. テストを書く
+3. `git commit` & `git push origin main`
+4. 自動デプロイを待つ（3-5分）
+5. https://j1921604.github.io/todo-app/ で動作確認
+
+**緊急時（自動デプロイ失敗）**:
+1. `npm run build`
+2. `npx gh-pages -d dist`
+3. 手動デプロイ完了
+
+### サポート
+
+問題が発生した場合：
+
+1. **GitHub Actions ログ**: https://github.com/J1921604/todo-app/actions
+2. **Issues**: https://github.com/J1921604/todo-app/issues
+3. **ローカルで再現**: `npm run build && npm run preview`
 
 ---
 
-## 🆘 サポート
-
-デプロイに関する問題が発生した場合：
-
-1. このドキュメントのトラブルシューティングセクションを確認
-2. GitHub Actionsのログを確認
-3. ローカルでビルド・テストを実行してエラーを特定
-4. 必要に応じて開発チームに相談
-
----
-
-**最終更新**: 2025年11月13日  
-**作成者**: GitHub Copilot  
-**バージョン**: 1.0.0
+**作成日**: 2025年11月13日  
+**バージョン**: 1.0.0  
+**ステータス**: ✅ Production Ready

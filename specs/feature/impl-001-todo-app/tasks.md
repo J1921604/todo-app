@@ -106,7 +106,7 @@
 
 ### ユーザーストーリー2のテスト（TDD） ⚠️
 
-- [ ] T033 [P] [US2] タスク削除統合テスト作成（tests/integration/task-deletion.test.tsx） - 個別削除
+- [x] T033 [P] [US2] タスク削除統合テスト作成（tests/integration/task-deletion.test.tsx） - 個別削除
 ### ユーザーストーリー2のテスト（TDD） ⚠️
 
 - [x] T033 [P] [US2] タスク削除統合テスト作成（tests/integration/task-deletion.test.tsx） - 個別削除
