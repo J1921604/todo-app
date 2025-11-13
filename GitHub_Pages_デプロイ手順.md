@@ -1,118 +1,234 @@
-# GitHub Pagesデプロイ手順
+# GitHub Pagesデプロイ手順# GitHub Pagesデプロイ手順
 
-## 目次
+
+
+このドキュメントでは、Todo AppをGitHub Pagesに手動でデプロイする方法を説明します。## 目次
+
 1. [自動デプロイ（推奨）](#自動デプロイ推奨)
-2. [手動デプロイ](#手動デプロイ)
+
+## 前提条件2. [手動デプロイ](#手動デプロイ)
+
 3. [初回セットアップ](#初回セットアップ)
-4. [トラブルシューティング](#トラブルシューティング)
 
----
+- GitHubアカウント4. [トラブルシューティング](#トラブルシューティング)
 
-## 自動デプロイ（推奨）
+- リポジトリへのプッシュ権限
 
-### 前提条件
+- Node.js 18以上のインストール---
+
+
+
+## デプロイ手順## 自動デプロイ（推奨）
+
+
+
+### 1. 最新のコードを取得### 前提条件
+
 - GitHubリポジトリ: `https://github.com/J1921604/todo-app`
-- GitHub Actions が有効化されている
 
-### 手順
+```powershell- GitHub Actions が有効化されている
+
+git checkout main
+
+git pull origin main### 手順
+
+```
 
 #### 1. deployブランチの確認と切り替え
 
+### 2. プロダクションビルドを実行
+
 ```powershell
-# 現在のブランチを確認
-git branch
 
-# deployブランチに切り替え
+```powershell# 現在のブランチを確認
+
+npm installgit branch
+
+npm run build
+
+```# deployブランチに切り替え
+
 git checkout deploy
-```
 
-**重要**: deployブランチは既に作成済みです。このブランチにpushすると、GitHub Actionsが自動的に：
-1. テストを実行
+ビルドが成功すると、`dist/`フォルダに以下のファイルが生成されます:```
+
+- `index.html`
+
+- `assets/index-[hash].js`**重要**: deployブランチは既に作成済みです。このブランチにpushすると、GitHub Actionsが自動的に：
+
+- `assets/index-[hash].css`1. テストを実行
+
 2. ビルドを実行
-3. **gh-pagesブランチを自動作成**
+
+### 3. gh-pagesブランチを作成・更新3. **gh-pagesブランチを自動作成**
+
 4. ビルド結果（dist/）をgh-pagesブランチにデプロイ
 
-#### 2. 変更をプッシュ（必要な場合のみ）
+```powershell
+
+# 一時フォルダにビルド成果物をコピー#### 2. 変更をプッシュ（必要な場合のみ）
+
+Copy-Item -Path dist\* -Destination ..\temp-dist -Recurse -Force
 
 ```powershell
-# 変更がある場合のみ
-git add .
-git commit -m "feat: Update todo app"
 
-# GitHubにプッシュ（自動デプロイが開始される）
-git push origin deploy
+# gh-pagesブランチに切り替え（初回は新規作成）# 変更がある場合のみ
+
+git checkout --orphan gh-pagesgit add .
+
+# または既存の場合: git checkout gh-pagesgit commit -m "feat: Update todo app"
+
+
+
+# すべてのファイルを削除# GitHubにプッシュ（自動デプロイが開始される）
+
+git rm -rf .git push origin deploy
+
 ```
 
-**注意**: 既にpush済みの場合は「Everything up-to-date」と表示されます。
+# ビルド成果物をコピー
 
-#### 3. GitHub Actionsの確認
+Copy-Item -Path ..\temp-dist\index.html -Destination . -Force**注意**: 既にpush済みの場合は「Everything up-to-date」と表示されます。
 
-1. GitHubリポジトリページを開く: https://github.com/J1921604/todo-app
-2. 「Actions」タブをクリック
-3. 「Deploy to GitHub Pages」ワークフローを確認
+New-Item -Path assets -ItemType Directory -Force
+
+Copy-Item -Path ..\temp-dist\assets\* -Destination assets\ -Force#### 3. GitHub Actionsの確認
+
+
+
+# 一時フォルダを削除1. GitHubリポジトリページを開く: https://github.com/J1921604/todo-app
+
+Remove-Item -Path ..\temp-dist -Recurse -Force2. 「Actions」タブをクリック
+
+```3. 「Deploy to GitHub Pages」ワークフローを確認
+
 4. 最新のワークフロー実行をクリック
-5. すべてのステップが成功（✅ グリーンチェック）になるまで待つ（通常2-3分）
 
-**ワークフローが実行されているはずの手順**:
-- ✅ Checkout
-- ✅ Setup Node.js
-- ✅ Install dependencies
-- ✅ Run tests
+### 4. 変更をコミットしてプッシュ5. すべてのステップが成功（✅ グリーンチェック）になるまで待つ（通常2-3分）
+
+
+
+```powershell**ワークフローが実行されているはずの手順**:
+
+git add .- ✅ Checkout
+
+git commit -m "Deploy to GitHub Pages"- ✅ Setup Node.js
+
+git push -f origin gh-pages- ✅ Install dependencies
+
+```- ✅ Run tests
+
 - ✅ Build
-- ✅ Deploy to GitHub Pages（これがgh-pagesブランチを自動作成）
 
-**トラブルシューティング**:
-- ワークフローが表示されない場合 → Actionsが有効化されているか確認
-- ワークフローが失敗している場合 → ログを確認して原因を特定
+### 5. mainブランチに戻る- ✅ Deploy to GitHub Pages（これがgh-pagesブランチを自動作成）
 
-#### 4. GitHub Pagesの設定（初回のみ）
 
-1. リポジトリの「Settings」タブを開く
+
+```powershell**トラブルシューティング**:
+
+git checkout main- ワークフローが表示されない場合 → Actionsが有効化されているか確認
+
+```- ワークフローが失敗している場合 → ログを確認して原因を特定
+
+
+
+### 6. GitHub Pagesの設定を確認#### 4. GitHub Pagesの設定（初回のみ）
+
+
+
+初回デプロイ時のみ必要です:1. リポジトリの「Settings」タブを開く
+
 2. 左サイドバーから「Pages」をクリック
-3. **Source**セクションで:
-   - **Source**: Deploy from a branch
-   - **Branch**: `gh-pages` / `/(root)`
-   - **Save**ボタンをクリック
 
-#### 5. デプロイ完了確認
+1. GitHubリポジトリページ（https://github.com/J1921604/todo-app）を開く3. **Source**セクションで:
 
-数分後、以下のURLでアプリが公開されます:
+2. 「Settings」タブをクリック   - **Source**: Deploy from a branch
 
-```
+3. 左サイドバーから「Pages」を選択   - **Branch**: `gh-pages` / `/(root)`
+
+4. 「Source」セクションで以下を設定:   - **Save**ボタンをクリック
+
+   - Source: `Deploy from a branch`
+
+   - Branch: `gh-pages`#### 5. デプロイ完了確認
+
+   - Folder: `/ (root)`
+
+5. 「Save」をクリック数分後、以下のURLでアプリが公開されます:
+
+
+
+### 7. デプロイ完了の確認```
+
 https://j1921604.github.io/todo-app/
-```
 
-ブラウザでアクセスして動作確認を行ってください。
+2-3分待ってから、以下のURLにアクセス:```
 
----
 
-## 手動デプロイ
 
-### 前提条件
+```ブラウザでアクセスして動作確認を行ってください。
+
+https://j1921604.github.io/todo-app/
+
+```---
+
+
+
+アプリケーションが正常に表示されれば、デプロイ完了です。## 手動デプロイ
+
+
+
+## トラブルシューティング### 前提条件
+
 - Node.js 16以上
-- npm 8以上
+
+### ページが404エラーになる- npm 8以上
+
 - `gh-pages` パッケージがインストール済み
 
-### 手順
+- GitHub PagesのSettings → Pagesで、SourceがDeployブランチ`gh-pages`に設定されているか確認
 
-#### 1. ビルド
+- 2-3分待ってから再度アクセス### 手順
 
-```powershell
-npm run build
+
+
+### ページが表示されるが真っ白#### 1. ビルド
+
+
+
+- `vite.config.ts`の`base`設定が`/todo-app/`になっているか確認```powershell
+
+- ビルドを再実行してから再度デプロイnpm run build
+
 ```
+
+### assetsフォルダが見つからない
 
 #### 2. デプロイ
 
-```powershell
+- `dist/`フォルダの構造を確認
+
+- `index.html`内のassets参照パスが正しいか確認```powershell
+
 npm run deploy
+
+## 更新時のデプロイ```
+
+
+
+アプリケーションを更新した後は、上記の手順1-5を再度実行してください。#### 3. 確認
+
+
+
+## 注意事項数分後、以下のURLでアプリが公開されます:
+
 ```
 
-#### 3. 確認
+- `gh-pages`ブランチは本番環境用です。直接編集しないでくださいhttps://j1921604.github.io/todo-app/
 
-数分後、以下のURLでアプリが公開されます:
-```
-https://j1921604.github.io/todo-app/
-```
+- すべての開発は`main`ブランチで行ってください```
+
+- デプロイ前に必ずテストが通ることを確認してください（`npm test`）
 
 ---
 
