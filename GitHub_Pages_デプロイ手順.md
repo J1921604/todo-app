@@ -16,38 +16,54 @@
 
 ### 手順
 
-#### 1. デプロイブランチの作成
+#### 1. deployブランチの確認と切り替え
 
 ```powershell
 # 現在のブランチを確認
 git branch
 
-# デプロイブランチを作成（まだ存在しない場合）
-git checkout -b deploy
-
-# または既存のデプロイブランチに切り替え
+# deployブランチに切り替え
 git checkout deploy
 ```
 
-#### 2. 変更をコミット & プッシュ
+**重要**: deployブランチは既に作成済みです。このブランチにpushすると、GitHub Actionsが自動的に：
+1. テストを実行
+2. ビルドを実行
+3. **gh-pagesブランチを自動作成**
+4. ビルド結果（dist/）をgh-pagesブランチにデプロイ
+
+#### 2. 変更をプッシュ（必要な場合のみ）
 
 ```powershell
-# 変更をステージング
+# 変更がある場合のみ
 git add .
-
-# コミット
-git commit -m "feat: Deploy todo app"
+git commit -m "feat: Update todo app"
 
 # GitHubにプッシュ（自動デプロイが開始される）
 git push origin deploy
 ```
 
+**注意**: 既にpush済みの場合は「Everything up-to-date」と表示されます。
+
 #### 3. GitHub Actionsの確認
 
 1. GitHubリポジトリページを開く: https://github.com/J1921604/todo-app
 2. 「Actions」タブをクリック
-3. 「Deploy to GitHub Pages」ワークフローが実行中であることを確認
-4. ワークフローが成功（✅ グリーンチェック）になるまで待つ（通常2-3分）
+3. 「Deploy to GitHub Pages」ワークフローを確認
+4. 最新のワークフロー実行をクリック
+5. すべてのステップが成功（✅ グリーンチェック）になるまで待つ（通常2-3分）
+
+**ワークフローが実行されているはずの手順**:
+- ✅ Checkout
+- ✅ Setup Node.js
+- ✅ Install dependencies
+- ✅ Run tests
+- ✅ Build
+- ✅ Deploy to GitHub Pages（これがgh-pagesブランチを自動作成）
+
+**トラブルシューティング**:
+- ワークフローが表示されない場合 → Actionsが有効化されているか確認
+- ワークフローが失敗している場合 → ログを確認して原因を特定
 
 #### 4. GitHub Pagesの設定（初回のみ）
 
