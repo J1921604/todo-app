@@ -61,7 +61,7 @@ git push origin main
 ↓
 6. Upload artifact（成果物アップロード）
 ↓
-7. Deploy to GitHub Pages（gh-pagesブランチにデプロイ）
+7. Deploy to GitHub Pages（GitHub Actions経由でデプロイ）
 ```
 
 ### デプロイ状況の確認

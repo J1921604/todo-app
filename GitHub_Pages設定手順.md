@@ -27,10 +27,10 @@ https://github.com/J1921604/todo-app
 
 **Build and deployment** セクションで以下を設定：
 
-- **Source**: `Deploy from a branch`
-- **Branch**: `gh-pages` を選択
-- **Folder**: `/ (root)` を選択
-- **Save** ボタンをクリック
+- **Source**: `GitHub Actions` を選択（重要！）
+
+**注意**: `Deploy from a branch` ではなく `GitHub Actions` を選択してください。
+これにより、GitHub Actionsワークフローが自動的にデプロイを管理します。
 
 ### ステップ5: Actions権限設定（必要な場合）
 
