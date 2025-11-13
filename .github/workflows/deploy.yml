@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - deploy
       - feature/impl-001-todo-app
   workflow_dispatch:
 
